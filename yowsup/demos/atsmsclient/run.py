@@ -89,5 +89,3 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print('closing')
             sys.exit(0)
-        for m in recv_msg:
-            print('From %s:\n%s\n' % m)

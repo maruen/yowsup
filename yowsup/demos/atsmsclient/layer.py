@@ -15,6 +15,7 @@ class EchoLayer(YowInterfaceLayer):
         #send receipt otherwise we keep receiving the same message over and over
         print str(messageProtocolEntity.getFrom()) + ' - ' + str(messageProtocolEntity.getBody())
         receipt = OutgoingReceiptProtocolEntity(messageProtocolEntity.getId(), messageProtocolEntity.getFrom())
+        #receipt = OutgoingReceiptProtocolEntity(messageProtocolEntity.getId(), messageProtocolEntity.getFrom(), 'read', messageProtocolEntity.getParticipant())
         self.toLower(receipt)
 
     @ProtocolEntityCallback("send_message")
@@ -27,7 +28,7 @@ class EchoLayer(YowInterfaceLayer):
 
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
-        ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", "delivery","None")
+        ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", "delivery", entity.getFrom())
         self.toLower(ack)
 
     # List of (jid, message) tuples
