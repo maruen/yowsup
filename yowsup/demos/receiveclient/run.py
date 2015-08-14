@@ -12,7 +12,7 @@ from yowsup.stacks import YowStack, YOWSUP_CORE_LAYERS
 from yowsup import env
 import sys
 
-CREDENTIALS = ("5511964958455", "R7U1GjrXKN7j/Jw9SdlF5xcJJWY=") # replace with your phone and password
+#CREDENTIALS = ("5511964958455", "R7U1GjrXKN7j/Jw9SdlF5xcJJWY=") # replace with your phone and password
 def send_message(destination, message):
 
     ''' destination is <phone number> without '+'
@@ -48,7 +48,8 @@ def send_message(destination, message):
         print('Authentication error %s' % e.message)
         sys.exit(1)
 
-def recv_message():
+def receive_message(credentials):
+
     layers = (  EchoLayer,
                 (YowAuthenticationProtocolLayer, YowMessagesProtocolLayer,
                 YowReceiptProtocolLayer, YowAckProtocolLayer,
@@ -57,12 +58,14 @@ def recv_message():
 
     stack = YowStack(layers)
     # Setting credentials
-    stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, CREDENTIALS)
+    stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, credentials)
 
     # WhatsApp server address
     stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])
     stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)
     stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())
+
+    stack.setProp(EchoLayer.PROP_CREDENTIALS, credentials)
 
     # Sending connecting signal
     stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))
@@ -85,7 +88,7 @@ if __name__ == '__main__':
             sys.exit(0)
     if sys.argv[1] == 'recv':
         try:
-            recv_message()
+            receive_message()
         except KeyboardInterrupt:
             print('closing')
             sys.exit(0)

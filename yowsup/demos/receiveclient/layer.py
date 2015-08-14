@@ -5,24 +5,44 @@ from yowsup.layers.protocol_acks.protocolentities import OutgoingAckProtocolEnti
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 import threading
 import logging
+import datetime
+import time
 
 logger = logging.getLogger(__name__)
 
 class EchoLayer(YowInterfaceLayer):
+
+    PROP_MESSAGES = "org.openwhatsapp.yowsup.prop.sendclient.queue"
+    PROP_CREDENTIALS = "org.openwhatsapp.yowsup.prop.auth.credentials"
+
+    def __init__(self):
+        super(EchoLayer, self).__init__()
+        self.ackQueue = []
+        self.lock = threading.Condition()
+
 
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
         #send receipt otherwise we keep receiving the same message over and over
         print str(messageProtocolEntity.getFrom()) + ' - ' + str(messageProtocolEntity.getBody())
         receipt = OutgoingReceiptProtocolEntity(messageProtocolEntity.getId(), messageProtocolEntity.getFrom())
-        #receipt = OutgoingReceiptProtocolEntity(messageProtocolEntity.getId(), messageProtocolEntity.getFrom(), 'read', messageProtocolEntity.getParticipant())
+
+	line = self.getProp(self.__class__.PROP_CREDENTIALS)[2]
+	ts = time.time()
+	at = messageProtocolEntity.getFrom().find('@');
+	timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y%m%d_%H%M%S_+{0}').format(messageProtocolEntity.getFrom()[0:at])
+	filename = '/var/spool/atsms/{0}/inbox/{1}'.format(line,timestamp)
+	f = open(filename,'w')
+	f.write(messageProtocolEntity.getBody())
+
+	
+		
         self.toLower(receipt)
+	#raise KeyboardInterrupt()
 
     @ProtocolEntityCallback("send_message")
     def sendMessage(self, destination, message, messageProtocolEntity):
-        outgoingMessageProtocolEntity = TextMessageProtocolEntity(
-        message,
-        to = destination + "@s.whatsapp.net")
+        outgoingMessageProtocolEntity = TextMessageProtocolEntity(message,to = destination + "@s.whatsapp.net")
         self.toLower(outgoingMessageProtocolEntity)
 
 
@@ -31,14 +51,7 @@ class EchoLayer(YowInterfaceLayer):
         ack = OutgoingAckProtocolEntity(entity.getId(), "receipt", "delivery", entity.getFrom())
         self.toLower(ack)
 
-    # List of (jid, message) tuples
-    PROP_MESSAGES = "org.openwhatsapp.yowsup.prop.sendclient.queue"
-
-    def __init__(self):
-        super(EchoLayer, self).__init__()
-        self.ackQueue = []
-        self.lock = threading.Condition()
-
+    
     @ProtocolEntityCallback("success")
     def onSuccess(self, successProtocolEntity):
         self.lock.acquire()
