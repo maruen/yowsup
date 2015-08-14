@@ -35,8 +35,6 @@ class EchoLayer(YowInterfaceLayer):
 	f = open(filename,'w')
 	f.write(messageProtocolEntity.getBody())
 
-	
-		
         self.toLower(receipt)
 	#raise KeyboardInterrupt()
 
