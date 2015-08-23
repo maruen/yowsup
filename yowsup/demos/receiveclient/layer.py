@@ -7,6 +7,8 @@ import threading
 import logging
 import datetime
 import time
+import subprocess
+import shlex
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,9 @@ class EchoLayer(YowInterfaceLayer):
 	filename = '/var/spool/atsms/{0}/inbox/{1}'.format(line,timestamp)
 	f = open(filename,'w')
 	f.write(messageProtocolEntity.getBody())
+	f.close()
+	print str('Running runOnReceive.sh for {0}'.format(line))
+	subprocess.call(shlex.split('/var/spool/atsms/runOnReceive.sh {0}'.format(line)))
 
         self.toLower(receipt)
 	#raise KeyboardInterrupt()
