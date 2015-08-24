@@ -45,7 +45,8 @@ class SendLayer(YowInterfaceLayer):
             
         if not len(self.ackQueue):
             self.lock.release()
-            logger.info("Message sent")
+            #logger.info("Message sent")
+	    print str("Message sent")
             raise KeyboardInterrupt()
 
         self.lock.release()

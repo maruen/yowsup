@@ -178,7 +178,7 @@ class YowStack(object):
         logger.debug("Initializing stack")
         for s in self.__stack:
             if type(s) is tuple:
-                logger.warn("Implicit declaration of parallel layers in a tuple is deprecated, pass a YowParallelLayer instead")
+                #logger.warn("Implicit declaration of parallel layers in a tuple is deprecated, pass a YowParallelLayer instead")
                 inst = YowParallelLayer(s)
             else:
                 if inspect.isclass(s):

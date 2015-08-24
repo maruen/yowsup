@@ -290,7 +290,7 @@ class DemosArgParser(YowArgParser):
                                                self.args["moxie"])
             stack.start()
         except KeyboardInterrupt:
-            print("\nYowsdown")
+            #print("\nYowsdown")
             sys.exit(0)
 	
     def startReceiveClient(self):
