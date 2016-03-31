@@ -50,6 +50,8 @@ class ProtocolTreeNode(object):
         out = "<"+self.tag
         if self.attributes is not None:
             for key,val in self.attributes.items():
+                if val is None:
+                    raise Exception("None val for key: "+key);
                 out+= " "+key+'="'+val+'"'
         out+= ">\n"
 
@@ -60,8 +62,13 @@ class ProtocolTreeNode(object):
                 except UnicodeDecodeError:
                     out += binascii.hexlify(self.data)
             else:
-                out += "%s" % self.data
-
+                try:
+                    out += "%s" % self.data
+                except UnicodeDecodeError:
+                    try:
+                        out += "%s" % self.data.decode()
+                    except UnicodeDecodeError:
+                        out += binascii.hexlify(self.data)
 
             if type(self.data) is str and sys.version_info >= (3,0):
                 out += "\nHEX3:%s\n" % binascii.hexlify(self.data.encode('latin-1'))
